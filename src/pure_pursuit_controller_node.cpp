@@ -31,9 +31,9 @@ PurePursuitController::PurePursuitController() : Node("pure_pursuit_controller")
       return result;
     });
 
-  odom_sub_ = this->create_subscription<nav_msgs::msg::Odometry>(
-    "/bcr_bot/odom", 10,
-    std::bind(&PurePursuitController::odom_callback, this, std::placeholders::_1));
+  pose_sub_ = this->create_subscription<geometry_msgs::msg::PoseStamped>(
+    "/amcl_lite_pose", 10,
+    std::bind(&PurePursuitController::pose_callback, this, std::placeholders::_1));
   path_sub_ = this->create_subscription<nav_msgs::msg::Path>(
     "/plan", 10,
     std::bind(&PurePursuitController::path_callback, this, std::placeholders::_1));
@@ -41,8 +41,8 @@ PurePursuitController::PurePursuitController() : Node("pure_pursuit_controller")
 }
 
 
-void PurePursuitController::odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg) {
-  current_pose_ = msg->pose.pose;
+void PurePursuitController::pose_callback(const geometry_msgs::msg::PoseStamped::SharedPtr msg) {
+  current_pose_ = msg->pose;
   has_pose_ = true;
   compute_and_publish_cmd();
 }

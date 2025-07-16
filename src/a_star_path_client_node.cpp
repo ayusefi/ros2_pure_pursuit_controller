@@ -12,17 +12,17 @@ public:
   using AStarPlanner = a_star_interfaces::action::AStarPlanner;
   using GoalHandleAStarPlanner = rclcpp_action::ClientGoalHandle<AStarPlanner>;
 
-  AStarPathClient() : Node("a_star_path_client"), has_odom_(false), has_goal_(false) {
+  AStarPathClient() : Node("a_star_path_client"), has_pose_(false), has_goal_(false) {
     // Action client for A* planner
     a_star_client_ = rclcpp_action::create_client<AStarPlanner>(this, "a_star_planner");
     
     // Publisher for the planned path
     path_pub_ = this->create_publisher<nav_msgs::msg::Path>("/plan", 10);
     
-    // Subscriber for robot odometry (start position)
-    odom_sub_ = this->create_subscription<nav_msgs::msg::Odometry>(
-      "/bcr_bot/odom", 10,
-      std::bind(&AStarPathClient::odom_callback, this, std::placeholders::_1));
+    // Subscriber for robot localized pose from AMCL Lite (start position)
+    pose_sub_ = this->create_subscription<geometry_msgs::msg::PoseStamped>(
+      "/amcl_lite_pose", 10,
+      std::bind(&AStarPathClient::pose_callback, this, std::placeholders::_1));
     
     // Subscriber for RViz goal pose
     goal_sub_ = this->create_subscription<geometry_msgs::msg::PoseStamped>(
@@ -30,19 +30,17 @@ public:
       std::bind(&AStarPathClient::goal_callback, this, std::placeholders::_1));
     
     RCLCPP_INFO(this->get_logger(), "A* Path Client started");
-    RCLCPP_INFO(this->get_logger(), "Waiting for odometry and goal pose from RViz...");
+    RCLCPP_INFO(this->get_logger(), "Waiting for AMCL Lite pose and goal pose from RViz...");
   }
 
 private:
-  void odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg) {
-    current_pose_.header = msg->header;
-    current_pose_.header.frame_id = "map";  // Convert to map frame
-    current_pose_.pose = msg->pose.pose;
-    has_odom_ = true;
+  void pose_callback(const geometry_msgs::msg::PoseStamped::SharedPtr msg) {
+    current_pose_ = *msg;
+    has_pose_ = true;
     
     if (!has_goal_) {
       RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 5000,
-        "Robot position: (%.2f, %.2f) - Waiting for goal pose from RViz...", 
+        "Robot localized position: (%.2f, %.2f) - Waiting for goal pose from RViz...", 
         current_pose_.pose.position.x, current_pose_.pose.position.y);
     }
   }
@@ -65,7 +63,7 @@ private:
                 goal_pose_.pose.position.x, goal_pose_.pose.position.y);
     
     // Request path when we have both start and goal
-    if (has_odom_ && has_goal_) {
+    if (has_pose_ && has_goal_) {
       request_path();
     }
   }
@@ -159,12 +157,12 @@ private:
 
   rclcpp_action::Client<AStarPlanner>::SharedPtr a_star_client_;
   rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr path_pub_;
-  rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_sub_;
+  rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr pose_sub_;
   rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr goal_sub_;
   
   geometry_msgs::msg::PoseStamped current_pose_;
   geometry_msgs::msg::PoseStamped goal_pose_;
-  bool has_odom_;
+  bool has_pose_;
   bool has_goal_;
 };
 

@@ -16,6 +16,14 @@ def generate_launch_description():
     rviz_config = os.path.join(pursuit_pkg_share, 'rviz', 'pure_pursuit_navigation.rviz')
     
     return LaunchDescription([
+        # AMCL Lite for robot localization
+        Node(
+            package='ros2_amcl_lite',
+            executable='amcl_lite_node',
+            name='amcl_lite_node',
+            output='screen',
+        ),
+        
         # Static transform from map to odom (identity transform for simplicity)
         Node(
             package='tf2_ros',

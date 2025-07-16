@@ -1,6 +1,6 @@
 # ROS 2 Pure Pursuit Controller
 
-A robust Pure Pursuit geometric path following controller for ROS 2, specifically designed for differential drive robots. This package integrates seamlessly with A* path planning and provides complete autonomous navigation capabilities.
+A robust Pure Pursuit geometric path following controller for ROS 2, specifically designed for differential drive robots. This package integrates seamlessly with A* path planning and AMCL Lite localization to provide complete autonomous navigation capabilities.
 
 ![Pure Pursuit Navigation](https://img.shields.io/badge/ROS2-Humble-blue) ![Build Status](https://img.shields.io/badge/Build-Passing-green) ![License](https://img.shields.io/badge/License-MIT-yellow)
 
@@ -16,7 +16,8 @@ Watch the Pure Pursuit controller in action with the BCR Bot:
 - 🎯 Interactive goal setting via RViz 2D Goal Pose tool
 - 🗺️ Real-time A* path planning on occupancy grid map
 - 🚗 Smooth Pure Pursuit path following with differential drive
-- 📊 Live visualization of planned paths and robot trajectory
+- � AMCL Lite particle filter localization for accurate positioning
+- �📊 Live visualization of planned paths, particles, and robot trajectory
 - ⚙️ Dynamic parameter tuning demonstration
 
 ---
@@ -28,7 +29,8 @@ The Pure Pursuit controller is a geometric path tracking algorithm that calculat
 - **Adaptive Look-ahead Distance**: Dynamic adjustment based on robot speed
 - **Differential Drive Optimization**: Rotation-in-place for sharp turns
 - **A* Path Planning Integration**: Seamless connection with grid-based planners
-- **RViz Integration**: Interactive goal setting and path visualization
+- **AMCL Lite Localization**: Particle filter-based pose estimation for accurate navigation
+- **RViz Integration**: Interactive goal setting and comprehensive visualization
 - **Parameter Tuning**: Comprehensive configuration via YAML files
 
 ## 🏗️ Architecture
@@ -44,6 +46,12 @@ The Pure Pursuit controller is a geometric path tracking algorithm that calculat
 │   Map Server    │    │   A* Planner     │    │   Robot Control    │
 │   /map          │    │   Action Server  │    │   /bcr_bot/cmd_vel │
 └─────────────────┘    └──────────────────┘    └────────────────────┘
+                                │                         ▲
+                                ▼                         │
+┌─────────────────┐    ┌──────────────────┐              │
+│   Laser Scan    │───▶│   AMCL Lite      │──────────────┘
+│   /bcr_bot/scan │    │   Localization   │ /amcl_lite_pose
+└─────────────────┘    └──────────────────┘
 ```
 
 ## 📋 Features
@@ -56,6 +64,7 @@ The Pure Pursuit controller is a geometric path tracking algorithm that calculat
 
 ### Navigation Stack
 - ✅ **A* Path Planning**: Grid-based optimal path planning
+- ✅ **AMCL Lite Localization**: Particle filter-based robot pose estimation
 - ✅ **Map Integration**: Support for occupancy grid maps
 - ✅ **Goal Management**: RViz-based interactive goal setting
 - ✅ **Transform Handling**: Proper coordinate frame management
@@ -63,6 +72,8 @@ The Pure Pursuit controller is a geometric path tracking algorithm that calculat
 ### Visualization & Debugging
 - ✅ **RViz Configuration**: Pre-configured visualization setup
 - ✅ **Path Visualization**: Real-time path and planning display
+- ✅ **Particle Visualization**: AMCL Lite particle cloud display
+- ✅ **Pose Visualization**: Localized robot pose with uncertainty
 - ✅ **Debug Information**: Comprehensive logging and status reporting
 
 ## 🚀 Quick Start
@@ -71,6 +82,7 @@ The Pure Pursuit controller is a geometric path tracking algorithm that calculat
 - ROS 2 Humble or later
 - BCR Bot simulation package
 - A* planner package
+- ROS 2 AMCL Lite package
 - Nav2 (for map server and lifecycle management)
 
 ### Installation
@@ -184,10 +196,12 @@ The demo video above shows the complete navigation workflow:
 
 #### Key Visual Elements:
 - 🟦 **Blue Robot Model**: Current robot position and orientation
+- 🟢 **Green Particles**: AMCL Lite particle cloud showing localization uncertainty
+- 🔴 **Red Arrow**: Localized robot pose from AMCL Lite (`/amcl_lite_pose`)
 - 🟢 **Green Path**: Pure Pursuit controller's planned trajectory (`/plan`)
 - 🟠 **Orange Path**: A* planner's calculated path (`/planned_path`)
 - 🗺️ **Gray Map**: Occupancy grid with obstacles (black) and free space (white)
-- 🔴 **Red Arrow**: Robot's odometry and velocity visualization
+- � **Laser Scan**: LIDAR points used for localization
 
 ### Parameter Tuning
 ```bash
@@ -229,16 +243,23 @@ source install/setup.bash
    ```bash
    ros2 topic list
    ros2 topic echo /plan
+   ros2 topic echo /amcl_lite_pose
    ros2 topic echo /bcr_bot/cmd_vel
    ```
 
-2. **Monitor node status:**
+2. **Monitor AMCL Lite localization:**
+   ```bash
+   ros2 topic echo /amcl_lite_particles
+   ros2 node info /amcl_lite_node
+   ```
+
+3. **Monitor node status:**
    ```bash
    ros2 node list
    ros2 node info /pure_pursuit_controller
    ```
 
-3. **View transforms:**
+4. **View transforms:**
    ```bash
    ros2 run tf2_tools view_frames
    ros2 run tf2_ros tf2_echo map odom
@@ -248,12 +269,13 @@ source install/setup.bash
 
 | Issue | Cause | Solution |
 |-------|-------|----------|
-| Robot not moving | No path received | Check A* planner connection |
+| Robot not moving | No localized pose | Check AMCL Lite is running and receiving laser data |
+| Poor localization | Insufficient particles | Set initial pose in RViz with 2D Pose Estimate |
+| Path planning fails | No start pose | Ensure AMCL Lite is publishing to `/amcl_lite_pose` |
 | Jerky motion | Look-ahead too small | Increase `look_ahead_distance` |
 | Overshooting goals | High speed/low tolerance | Reduce `max_linear_velocity` or decrease `goal_tolerance` |
 | Map not visible | QoS mismatch | Verify map server is running |
 
-```
 
 ## 📄 License
 
@@ -269,5 +291,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [bcr_bot](https://github.com/blackcoffeerobotics/bcr_bot) - Robot simulation package
 - [a_star_planner](https://github.com/ayusefi/a_star_planner) - Grid-based path planning
+- [ros2_amcl_lite](https://github.com/ayusefi/ros2_amcl_lite) - Lightweight particle filter localization
 
 ---

@@ -14,14 +14,14 @@ public:
   PurePursuitController();
 
 private:
-  void odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg);
+  void pose_callback(const geometry_msgs::msg::PoseStamped::SharedPtr msg);
   void path_callback(const nav_msgs::msg::Path::SharedPtr msg);
   void compute_and_publish_cmd();
   geometry_msgs::msg::Point find_lookahead_point(const geometry_msgs::msg::Pose &current_pose, const std::vector<geometry_msgs::msg::PoseStamped> &path, double lookahead_distance);
   std::pair<double, double> calculate_control(const geometry_msgs::msg::Pose &current_pose, const geometry_msgs::msg::Point &lookahead_point);
   double get_yaw_from_pose(const geometry_msgs::msg::Pose &pose);
 
-  rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_sub_;
+  rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr pose_sub_;
   rclcpp::Subscription<nav_msgs::msg::Path>::SharedPtr path_sub_;
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr cmd_pub_;
 
