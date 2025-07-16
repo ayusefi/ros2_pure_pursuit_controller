@@ -1,0 +1,39 @@
+# ROS 2 specific
+build/
+install/
+log/
+.colcon_install_layout
+.colcon_built_packages
+
+# IDE specific
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build artifacts
+*.o
+*.so
+*.a
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Backup files
+*~
+*.bak
+*.backup
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
