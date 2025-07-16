@@ -61,4 +61,8 @@ install(DIRECTORY rviz/
   DESTINATION share/${PROJECT_NAME}/rviz/
 )
 
+install(DIRECTORY docs/
+  DESTINATION share/${PROJECT_NAME}/docs/
+)
+
 ament_package()

@@ -4,7 +4,24 @@ A robust Pure Pursuit geometric path following controller for ROS 2, specificall
 
 ![Pure Pursuit Navigation](https://img.shields.io/badge/ROS2-Humble-blue) ![Build Status](https://img.shields.io/badge/Build-Passing-green) ![License](https://img.shields.io/badge/License-MIT-yellow)
 
-## 🎯 Overview
+## � Demo Video
+
+Watch the Pure Pursuit controller in action with the BCR Bot:
+
+[![Pure Pursuit Navigation Demo](https://img.youtube.com/vi/olQ6hnRsmEk/maxresdefault.jpg)](https://youtu.be/olQ6hnRsmEk)
+
+*Click the image above to watch the full demonstration video showing autonomous navigation using Pure Pursuit controller with A* path planning.*
+
+**Video Features:**
+- 🎯 Interactive goal setting via RViz 2D Goal Pose tool
+- 🗺️ Real-time A* path planning on occupancy grid map
+- 🚗 Smooth Pure Pursuit path following with differential drive
+- 📊 Live visualization of planned paths and robot trajectory
+- ⚙️ Dynamic parameter tuning demonstration
+
+---
+
+## �🎯 Overview
 
 The Pure Pursuit controller is a geometric path tracking algorithm that calculates steering commands to follow a given path. This implementation is optimized for differential drive robots and includes:
 
@@ -150,6 +167,28 @@ ros2 launch ros2_pure_pursuit_controller pure_pursuit_sim.launch.py
 # Set goals via RViz GUI using "2D Goal Pose" tool
 ```
 
+### 📸 Screenshots & Media
+
+#### RViz Navigation Interface
+![RViz Interface](docs/images/rviz_interface.png)
+*RViz interface showing the robot, map, planned path (orange), and Pure Pursuit path (green)*
+
+#### Navigation in Action
+The demo video above shows the complete navigation workflow:
+
+1. **Map Loading**: BCR map loaded with static obstacles
+2. **Goal Setting**: Click "2D Goal Pose" tool in RViz to set destination
+3. **Path Planning**: A* algorithm calculates optimal path avoiding obstacles
+4. **Path Following**: Pure Pursuit controller smoothly follows the planned path
+5. **Goal Reaching**: Robot stops when reaching the goal within tolerance
+
+#### Key Visual Elements:
+- 🟦 **Blue Robot Model**: Current robot position and orientation
+- 🟢 **Green Path**: Pure Pursuit controller's planned trajectory (`/plan`)
+- 🟠 **Orange Path**: A* planner's calculated path (`/planned_path`)
+- 🗺️ **Gray Map**: Occupancy grid with obstacles (black) and free space (white)
+- 🔴 **Red Arrow**: Robot's odometry and velocity visualization
+
 ### Parameter Tuning
 ```bash
 # Real-time parameter adjustment
@@ -214,38 +253,7 @@ source install/setup.bash
 | Overshooting goals | High speed/low tolerance | Reduce `max_linear_velocity` or decrease `goal_tolerance` |
 | Map not visible | QoS mismatch | Verify map server is running |
 
-## 🧪 Testing
-
-### Unit Tests
-```bash
-# Run package tests
-cd ~/ros2_ws
-colcon test --packages-select ros2_pure_pursuit_controller
-colcon test-result --verbose
 ```
-
-### Performance Testing
-```bash
-# Test with static path (no A* planner needed)
-ros2 run ros2_pure_pursuit_controller static_path_publisher_node
-ros2 run ros2_pure_pursuit_controller pure_pursuit_controller_node
-```
-
-## 🤝 Contributing
-
-We welcome contributions! Please follow these guidelines:
-
-1. **Fork the repository**
-2. **Create a feature branch:** `git checkout -b feature/amazing-feature`
-3. **Commit changes:** `git commit -m 'Add amazing feature'`
-4. **Push to branch:** `git push origin feature/amazing-feature`
-5. **Open a Pull Request**
-
-### Code Style
-- Follow ROS 2 C++ style guidelines
-- Use meaningful variable names
-- Add comprehensive comments
-- Include unit tests for new features
 
 ## 📄 License
 
@@ -257,20 +265,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Nav2 Project** for navigation stack inspiration
 - **Pure Pursuit Algorithm** researchers for the foundational work
 
-## 📞 Support
-
-For questions, issues, or contributions:
-
-- **GitHub Issues**: [Create an issue](https://github.com/your-repo/issues)
-- **ROS Discourse**: [ROS 2 Community](https://discourse.ros.org/)
-- **Documentation**: Check the inline code documentation
-
 ## 🔗 Related Packages
 
 - [bcr_bot](https://github.com/blackcoffeerobotics/bcr_bot) - Robot simulation package
-- [a_star_planner](https://github.com/your-org/a_star_planner) - Grid-based path planning
-- [nav2](https://github.com/ros-planning/navigation2) - ROS 2 Navigation Framework
+- [a_star_planner](https://github.com/ayusefi/a_star_planner) - Grid-based path planning
 
 ---
-
-**Made with ❤️ for the ROS 2 community**
